@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="NeuroGuard logo">
+  <defs>
+    <linearGradient id="shieldTop" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8ed7f6"/>
+      <stop offset="100%" stop-color="#73b9da"/>
+    </linearGradient>
+    <linearGradient id="shieldBottom" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#5a5ca2"/>
+      <stop offset="100%" stop-color="#444784"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M64 8c10 10 24 14 40 14v40c0 23-14 42-40 58C38 104 24 85 24 62V22c16 0 30-4 40-14z" fill="url(#shieldTop)"/>
+  <path d="M24 60c11 0 18 3 27 7 9 4 17 4 26 0 9-4 16-7 27-7v2c0 23-14 42-40 58C38 104 24 85 24 62z" fill="url(#shieldBottom)"/>
+
+  <g fill="none" stroke="#ffffff" stroke-width="3.5" stroke-linecap="round">
+    <circle cx="64" cy="52" r="17"/>
+    <line x1="64" y1="35" x2="64" y2="69"/>
+    <path d="M53 46c4-6 18-6 22 0"/>
+    <path d="M53 58c4 6 18 6 22 0"/>
+    <path d="M42 77c14 8 30 8 44 0"/>
+    <line x1="64" y1="69" x2="64" y2="84"/>
+  </g>
+
+  <circle cx="26" cy="61" r="5" fill="#ffffff"/>
+</svg>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#667eea">
+  <title>Admin Messages - NeuroGuard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page app-theme">
+  <nav>
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+        <a href="#" onclick="api.logout();" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container admin-page-container">
+    <div class="dashboard-header">
+      <h1>Admin Insights Dashboard</h1>
+      <p>Live hackathon view: voice screening metrics + contact inbox.</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Total Voice Tests</div>
+        <div class="value" id="totalTests">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Average Stress Score</div>
+        <div class="value" id="avgStress">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">High Stress Cases</div>
+        <div class="value" id="highStressCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Contact Messages</div>
+        <div class="value" id="totalMessages">0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="inbox-header">
+        <h2 style="margin: 0;">Inbox</h2>
+        <button class="btn btn-secondary" onclick="loadDashboardData()">Refresh</button>
+      </div>
+      <div id="messagesContainer" class="messages-container">
+        <p class="text-muted">Loading messages...</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    if (!api.isAuthenticated()) {
+      window.location.href = '/';
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    async function loadInsights() {
+      const result = await api.getVoiceStats();
+      if (!result.success) {
+        return;
+      }
+      const stats = result.data || {};
+      const dist = stats.stress_distribution || stats.risk_distribution || {};
+      document.getElementById('totalTests').textContent = stats.total_tests || 0;
+      const avg = Number(stats.average_stress_score ?? stats.average_risk_score ?? 0);
+      document.getElementById('avgStress').textContent = `${avg.toFixed(1)}%`;
+      document.getElementById('highStressCount').textContent = dist.High || 0;
+    }
+
+    async function loadMessages() {
+      const result = await api.getContactMessages();
+      const container = document.getElementById('messagesContainer');
+
+      if (!result.success) {
+        container.innerHTML = `<p class="text-muted">Failed to load messages: ${escapeHtml(result.error || 'Unknown error')}</p>`;
+        return;
+      }
+
+      const messages = result.data.messages || [];
+      document.getElementById('totalMessages').textContent = result.data.total_messages || messages.length || 0;
+
+      if (!messages.length) {
+        container.innerHTML = '<p class="text-muted">No contact messages yet.</p>';
+        return;
+      }
+
+      let html = '<div class="messages-table-wrapper"><table class="messages-table"><thead><tr><th class="col-date">Date</th><th class="col-name">Name</th><th class="col-email">Email</th><th class="col-subject">Subject</th><th class="col-message">Message</th></tr></thead><tbody>';
+      messages.forEach((msg) => {
+        html += `
+          <tr>
+            <td class="col-date" data-label="Date">${formatDate(msg.created_at)}</td>
+            <td class="col-name" data-label="Name">${escapeHtml(msg.name)}</td>
+            <td class="col-email" data-label="Email">${escapeHtml(msg.email)}</td>
+            <td class="col-subject" data-label="Subject">${escapeHtml(msg.subject)}</td>
+            <td class="col-message" data-label="Message">${escapeHtml(msg.message)}</td>
+          </tr>
+        `;
+      });
+      html += '</tbody></table></div>';
+      container.innerHTML = html;
+    }
+
+    async function loadDashboardData() {
+      await Promise.all([loadInsights(), loadMessages()]);
+    }
+
+    loadDashboardData();
+  </script>
+</body>
+</html>

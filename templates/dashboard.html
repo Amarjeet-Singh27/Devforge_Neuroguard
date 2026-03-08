@@ -1,0 +1,276 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#667eea">
+  <title>Dashboard - NeuroGuard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page app-theme">
+  <nav>
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+        <a href="#" onclick="api.logout();" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding: 3rem 2rem;">
+    <!-- Welcome Section -->
+    <div class="dashboard-header">
+      <h1 id="welcomeText">Welcome to NeuroGuard</h1>
+      <p>Monitor your voice health and verify medicine authenticity</p>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="label">Total Tests</div>
+        <div class="value" id="totalTests">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Average Risk Score</div>
+        <div class="value" id="avgRisk">0%</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Low Risk Tests</div>
+        <div class="value" id="lowRiskCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Medium Risk Tests</div>
+        <div class="value" id="mediumRiskCount">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">High Risk Tests</div>
+        <div class="value" id="highRiskCount">0</div>
+      </div>
+    </div>
+
+    <!-- Latest Test -->
+    <div class="card">
+      <h2>Latest Voice Test</h2>
+      <div id="latestTestContent">
+        <p style="text-align: center; color: #6b7280;">No tests yet. <a href="/voice-test.html">Take your first test</a></p>
+      </div>
+    </div>
+
+    <!-- Recent Tests -->
+    <div class="card" style="margin-top: 2rem;">
+      <h2>Recent Tests</h2>
+      <div id="recentTests">
+        <p style="text-align: center; color: #6b7280;">Loading...</p>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-2" style="margin-top: 2rem;">
+      <div class="card">
+        <h3>Voice Test</h3>
+        <p>Record your voice and get instant neurological risk assessment</p>
+        <a href="/voice-test.html" class="btn btn-primary btn-block" style="margin-top: 1rem;">Start Test</a>
+      </div>
+      <div class="card">
+        <h3>Medicine Checker</h3>
+        <p>Verify medicine authenticity and track supply chain</p>
+        <a href="/medicine-check.html" class="btn btn-primary btn-block" style="margin-top: 1rem;">Check Medicine</a>
+      </div>
+      <div class="card admin-only">
+        <h3>Admin Messages</h3>
+        <p>Review submitted contact requests in one place.</p>
+        <a href="/admin-messages.html" class="btn btn-primary btn-block admin-only" style="margin-top: 1rem;">Open Inbox</a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-top">
+      <div>
+        <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <p>AI-powered voice analysis for stress detection and health insight support.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="/#features">Features</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="/contact.html">Contact Us</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">HIPAA Compliance</a>
+      </div>
+    </div>
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+
+    // Check authentication
+    if (!api.isAuthenticated()) {
+      window.location.href = '/';
+    }
+
+    // Load user profile
+    async function loadProfile() {
+      try {
+        const result = await api.getProfile();
+        if (result.success) {
+          document.getElementById('welcomeText').textContent = `Welcome, ${result.data.full_name}!`;
+
+        }
+      } catch (error) {
+        console.error('Error loading profile:', error);
+        showAlert('Failed to load profile', 'danger');
+      }
+    }
+
+    // Load stats
+    async function loadStats() {
+      try {
+        const result = await api.getVoiceStats();
+        if (result.success) {
+          const stats = result.data;
+          
+          // Animate stat card values with stagger
+          const updateStatCard = (id, value, delay = 0) => {
+            setTimeout(() => {
+              const element = document.getElementById(id);
+
+              element.textContent = value;
+            }, delay);
+          };
+          
+          updateStatCard('totalTests', stats.total_tests, 0);
+          updateStatCard('avgRisk', stats.average_risk_score.toFixed(1) + '%', 100);
+          updateStatCard('lowRiskCount', stats.risk_distribution.Low || 0, 200);
+          updateStatCard('mediumRiskCount', stats.risk_distribution.Medium || 0, 300);
+          updateStatCard('highRiskCount', stats.risk_distribution.High || 0, 400);
+
+          // Show latest test with animation
+          if (stats.latest_test) {
+            const test = stats.latest_test;
+            const riskClass = `risk-${test.risk_level.toLowerCase()}`;
+            document.getElementById('latestTestContent').innerHTML = `
+              <div class="flex flex-between">
+                <div>
+                  <h3>Test Date: ${formatDate(test.test_date)}</h3>
+                  <p class="text-muted">${test.recommendations}</p>
+                </div>
+                <div>
+                  <div class="risk-badge ${riskClass}">${test.risk_level} - ${test.risk_score}%</div>
+                </div>
+              </div>
+              <div class="progress-bar" style="margin: 1rem 0;">
+                <div class="progress-fill" style="width: ${test.risk_score}%">${Math.round(test.risk_score)}%</div>
+              </div>
+              <div class="grid grid-3" style="margin-top: 1rem; gap: 1rem;">
+                <div>
+                  <small class="text-muted">Slurring</small><br>
+                  <strong>${test.slurring_score.toFixed(1)}%</strong>
+                </div>
+                <div>
+                  <small class="text-muted">Speech Delay</small><br>
+                  <strong>${test.speech_delay_score.toFixed(1)}%</strong>
+                </div>
+                <div>
+                  <small class="text-muted">Frequency Var.</small><br>
+                  <strong>${test.frequency_variation_score.toFixed(1)}%</strong>
+                </div>
+              </div>
+            `;
+            document.getElementById('latestTestContent').style.animation = 'fadeIn 0.6s ease-in';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading stats:', error);
+        showAlert('Failed to load statistics', 'danger');
+      }
+    }
+
+    // Load recent tests
+    async function loadRecentTests() {
+      try {
+        const result = await api.getVoiceHistory();
+        if (result.success && result.data.tests.length > 0) {
+          const tests = result.data.tests.slice(0, 5);
+          let html = '<table><thead><tr><th>Date</th><th>Risk Level</th><th>Score</th></tr></thead><tbody>';
+          
+          tests.forEach((test, index) => {
+            const riskClass = `risk-${test.risk_level.toLowerCase()}`;
+            html += `
+              <tr style="animation: fadeIn 0.6s ease-in; animation-delay: ${index * 0.1}s;">
+                <td>${formatDate(test.test_date)}</td>
+                <td><span class="risk-badge ${riskClass}">${test.risk_level}</span></td>
+                <td><strong>${test.risk_score.toFixed(1)}%</strong></td>
+              </tr>
+            `;
+          });
+          
+          html += '</tbody></table>';
+          document.getElementById('recentTests').innerHTML = html;
+          document.getElementById('recentTests').style.animation = 'fadeIn 0.6s ease-in';
+        }
+      } catch (error) {
+        console.error('Error loading recent tests:', error);
+        showAlert('Failed to load test history', 'danger');
+      }
+    }
+
+    // Load data on page load with smooth transitions
+    document.addEventListener('DOMContentLoaded', () => {
+      loadProfile();
+      loadStats();
+      loadRecentTests();
+    });
+
+    // Refresh stats every 30 seconds with smooth updates
+    setInterval(() => {
+      loadStats();
+    }, 30000);
+  </script>
+</body>
+</html>
+

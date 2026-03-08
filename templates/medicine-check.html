@@ -1,0 +1,330 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#667eea">
+  <title>Medicine Verification - NeuroGuard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page app-theme">
+  <nav>
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+        <a href="#" onclick="api.logout();" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding: 3rem 2rem;">
+    <div class="dashboard-header">
+      <h1>Medicine Verification System</h1>
+      <p>Verify medicine authenticity using secure hash chain technology</p>
+    </div>
+
+    <div class="grid grid-2">
+      <!-- Verification Form -->
+      <div class="card">
+        <h2>Verify Medicine</h2>
+
+        <div class="form-group">
+          <label>Batch ID</label>
+          <input type="text" id="batchId" placeholder="e.g., BATCH-2024-001">
+        </div>
+
+        <button class="btn btn-primary btn-block" onclick="verifyMedicine()">Verify Authenticity</button>
+
+        <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid #e5e7eb;">
+          <p style="color: #111827; margin-bottom: 1rem;">Don't have a Batch ID? Scan the QR code instead:</p>
+          <button id="scanQrBtn" class="btn btn-secondary btn-block" onclick="openQRScanner()">Scan QR Code</button>
+        </div>
+
+      </div>
+
+      <!-- Results Section -->
+      <div class="card" id="resultsSection" style="display: none;">
+        <h2>Verification Result</h2>
+        <div id="verificationResult"></div>
+      </div>
+
+      <!-- Info Section -->
+      <div class="card" id="infoSection">
+        <h2>How It Works</h2>
+        
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: #667eea; margin-bottom: 0.5rem;">Hash Chain Technology</h4>
+          <p>Every medicine batch is tracked using SHA256 hash chains, creating an immutable record of its journey through the supply chain.</p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: #667eea; margin-bottom: 0.5rem;">Supply Chain Tracking</h4>
+          <p>From manufacturer -> distribution -> pharmacy -> patient. Each step is cryptographically verified.</p>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <h4 style="color: #667eea; margin-bottom: 0.5rem;">Authenticity Verification</h4>
+          <p>No tampering detected means the medicine traveled through the legitimate supply chain without any modifications.</p>
+        </div>
+
+        <div style="background: #dcfce7; padding: 1rem; border-radius: 5px; border-left: 4px solid #10b981;">
+          <strong style="color: #166534;">Safe Indicator:</strong>
+          <p style="margin: 0.5rem 0 0 0; color: #166534;">If you see "Authentic", the medicine is genuine and has not been tampered with.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Supply Chain Details -->
+    <div class="card" id="supplyChainSection" style="display: none; margin-top: 2rem;">
+      <h2>Supply Chain Timeline</h2>
+      <div class="timeline" id="timelineContent">
+        <!-- Timeline will be inserted here -->
+      </div>
+    </div>
+
+    <!-- Admin Only: Register New Medicine -->
+    <div class="card admin-only" style="margin-top: 2rem;">
+      <h2>Register New Medicine</h2>
+
+      <div class="form-group">
+        <label>Batch ID</label>
+        <input type="text" id="newBatchId" placeholder="BATCH-2024-001">
+      </div>
+
+      <div class="form-group">
+        <label>Medicine Name</label>
+        <input type="text" id="medicineName" placeholder="Aspirin 500mg">
+      </div>
+
+      <div class="form-group">
+        <label>Manufacturer</label>
+        <input type="text" id="manufacturerName" placeholder="Pharma Corp">
+      </div>
+
+      <div class="form-group">
+        <label>Expiry Date</label>
+        <input type="date" id="expiryDate">
+      </div>
+
+      <button class="btn btn-success btn-block admin-only" onclick="registerMedicine()">Register Medicine</button>
+    </div>
+  </div>
+
+  <!-- QR Scanner Modal -->
+  <div id="qrModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Scan QR Code</h2>
+        <button class="close-btn" onclick="closeQRScanner()">X</button>
+      </div>
+      <div id="qrScannerContent">
+        <p>QR Scanner feature coming soon. For now, please enter the Batch ID manually.</p>
+        <button class="btn btn-secondary btn-block" onclick="closeQRScanner()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-top">
+      <div>
+        <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <p>AI-powered voice analysis for stress detection and health insight support.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="/#features">Features</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">HIPAA Compliance</a>
+      </div>
+    </div>
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+
+    // Check authentication
+    if (!api.isAuthenticated()) {
+      window.location.href = '/';
+    }
+
+    // Verify medicine
+    async function verifyMedicine() {
+      const batchId = document.getElementById('batchId').value.trim();
+      if (!batchId) {
+        showAlert('Please enter a Batch ID', 'warning');
+        return;
+      }
+
+      const result = await api.verifyMedicine(batchId);
+      if (result.success) {
+        displayVerificationResult(result.data);
+      } else {
+        showAlert('Medicine not found: ' + result.error, 'danger');
+      }
+    }
+
+    // Display verification result
+    function displayVerificationResult(data) {
+      document.getElementById('infoSection').style.display = 'none';
+      document.getElementById('resultsSection').style.display = 'block';
+      document.getElementById('supplyChainSection').style.display = 'block';
+
+      const isAuthentic = data.is_authentic;
+      const statusColor = isAuthentic ? '#10b981' : '#ef4444';
+      const statusText = isAuthentic ? 'AUTHENTIC' : 'COUNTERFEIT';
+      const statusBg = isAuthentic ? '#dcfce7' : '#fee2e2';
+
+      let html = `
+        <div style="background: ${statusBg}; padding: 1.5rem; border-radius: 10px; border-left: 4px solid ${statusColor}; margin-bottom: 1.5rem;">
+          <div style="font-size: 2rem; color: ${statusColor}; margin-bottom: 0.5rem;">${statusText}</div>
+          <h3 style="margin: 0.5rem 0; color: #1f2937;">${data.medicine_name}</h3>
+          <p style="margin: 0.5rem 0; color: #6b7280;">by ${data.manufacturer}</p>
+        </div>
+
+        <div style="background: #f0f4ff; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem;">
+          <div class="grid grid-2" style="gap: 1rem;">
+            <div>
+              <small class="text-muted">Batch ID</small><br>
+              <strong>${data.batch_id}</strong>
+            </div>
+            <div>
+              <small class="text-muted">Chain Integrity</small><br>
+              <strong style="color: ${data.chain_valid ? '#10b981' : '#ef4444'};">
+                ${data.chain_valid ? 'Valid' : 'Invalid'}
+              </strong>
+            </div>
+            <div>
+              <small class="text-muted">Supply Chain Stops</small><br>
+              <strong>${data.supply_chain.length}</strong>
+            </div>
+            <div>
+              <small class="text-muted">Verification Status</small><br>
+              <strong>${data.is_authentic ? 'Verified' : 'Failed'}</strong>
+            </div>
+          </div>
+        </div>
+
+        ${!isAuthentic ? `
+          <div style="background: #fee2e2; padding: 1rem; border-radius: 5px; border-left: 4px solid #ef4444;">
+            <strong style="color: #991b1b;">WARNING:</strong>
+            <p style="margin: 0.5rem 0 0 0; color: #991b1b;">This medicine appears to be counterfeit or has been tampered with. DO NOT USE. Contact your pharmacy or health authorities.</p>
+          </div>
+        ` : ''}
+      `;
+
+      document.getElementById('verificationResult').innerHTML = html;
+      displaySupplyChain(data.supply_chain);
+    }
+
+    // Display supply chain timeline
+    function displaySupplyChain(supplyChain) {
+      let timelineHtml = '';
+      supplyChain.forEach((record, index) => {
+        timelineHtml += `
+          <div class="timeline-item">
+            <div class="timeline-dot">${index + 1}</div>
+            <div class="timeline-content">
+              <div class="location">Location: ${record.location}</div>
+              <div class="handler">Handler: ${record.handler}</div>
+              <div class="timestamp">Time: ${formatDate(record.timestamp)}</div>
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById('timelineContent').innerHTML = timelineHtml;
+    }
+
+    async function registerMedicine() {
+      const batchId = document.getElementById('newBatchId').value.trim();
+      const name = document.getElementById('medicineName').value.trim();
+      const manufacturer = document.getElementById('manufacturerName').value.trim();
+      const expiryDate = document.getElementById('expiryDate').value;
+
+      if (!batchId || !name || !manufacturer || !expiryDate) {
+        showAlert('Please fill in all fields', 'warning');
+        return;
+      }
+
+      const result = await api.registerMedicineBatch(batchId, name, manufacturer, expiryDate);
+      if (!result.success) {
+        showAlert('Registration failed: ' + (result.error || 'Unknown error'), 'danger');
+        return;
+      }
+
+      showAlert('Medicine batch registered successfully!', 'success');
+      const qrData = result.data?.qr_data || '';
+      alert(`\nMedicine Registered!\n\nBatch ID: ${batchId}\nRoot Hash: ${result.data.root_hash}\n\nQR Code Data:\n${qrData}`);
+
+      document.getElementById('newBatchId').value = '';
+      document.getElementById('medicineName').value = '';
+      document.getElementById('manufacturerName').value = '';
+      document.getElementById('expiryDate').value = '';
+    }
+
+    // QR Scanner
+    function openQRScanner() {
+      document.getElementById('qrModal').classList.add('active');
+    }
+
+    function closeQRScanner() {
+      document.getElementById('qrModal').classList.remove('active');
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('qrModal');
+      if (event.target === modal) {
+        closeQRScanner();
+      }
+    }
+  </script>
+</body>
+</html>
+
+
+

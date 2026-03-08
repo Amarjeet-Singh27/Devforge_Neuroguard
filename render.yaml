@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: neuroguard
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn wsgi:app --bind 0.0.0.0:$PORT --workers 2 --timeout 180
+    envVars:
+      - key: APP_CONFIG
+        value: production
+      - key: FLASK_DEBUG
+        value: "0"
+      - key: USE_HTTPS
+        value: "0"
+      - key: DATABASE_URL
+        value: sqlite:////var/data/neuroguard.db
+      - key: UPLOAD_FOLDER
+        value: /var/data/uploads
+      - key: JWT_SECRET_KEY
+        generateValue: true
+    disk:
+      name: neuroguard-data
+      mountPath: /var/data
+      sizeGB: 2

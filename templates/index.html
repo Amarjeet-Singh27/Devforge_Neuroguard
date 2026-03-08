@@ -1,0 +1,495 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#0b0b25">
+  <title>NeuroGuard - Voice Health & Medicine Verification</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page">
+  <nav id="mainNav">
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Open menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="nav-links" id="navLinks">
+          <a href="#features">Features</a>
+          <a href="#demo">Demo</a>
+          <a href="#about">About</a>
+          <a href="#" onclick="showLoginForm()">Sign In</a>
+        </div>
+    </div>
+  </nav>
+
+  <main id="landingSection" class="ng-main">
+    <section class="ng-hero" id="demo">
+      <div class="container">
+        <div class="ng-badge">AI-Powered Voice Analysis</div>
+        <h1>Your Voice Knows<br>More Than You Think</h1>
+        <p>AI-powered emotional and stress analysis in seconds.</p>
+        <div class="ng-hero-actions">
+          <button class="btn ng-btn-gradient" onclick="showLoginForm()">Upload Audio</button>
+          <a href="#features" class="btn ng-btn-ghost">Learn More</a>
+        </div>
+        <div class="ng-tagline-marquee" aria-label="NeuroGuard highlights">
+          <div class="ng-tagline-track">
+            <span>AI Voice Screening</span>
+            <span>Early Stress Signals</span>
+            <span>Secure Medicine Verification</span>
+            <span>Hash-Chain Integrity</span>
+            <span>Fast Preventive Insights</span>
+            <span>AI Voice Screening</span>
+            <span>Early Stress Signals</span>
+            <span>Secure Medicine Verification</span>
+            <span>Hash-Chain Integrity</span>
+            <span>Fast Preventive Insights</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="ng-section" id="how-it-works">
+      <div class="container">
+        <h2>How It Works</h2>
+        <p class="ng-subtitle">Three simple steps to understand your emotional wellbeing</p>
+        <div class="ng-steps">
+          <article class="ng-step-card">
+            <span class="ng-step-index">1</span>
+            <div class="ng-step-icon">UP</div>
+            <h3>Upload Voice</h3>
+            <p>Upload your audio file or record directly in the browser.</p>
+          </article>
+          <article class="ng-step-card">
+            <span class="ng-step-index">2</span>
+            <div class="ng-step-icon">AI</div>
+            <h3>AI Analysis</h3>
+            <p>Advanced AI processes vocal patterns and emotional markers.</p>
+          </article>
+          <article class="ng-step-card">
+            <span class="ng-step-index">3</span>
+            <div class="ng-step-icon">REP</div>
+            <h3>Get Report</h3>
+            <p>Receive clear insights for stress and emotional state review.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ng-section ng-grid-bg" id="features">
+      <div class="container">
+        <h2>Powerful Features</h2>
+        <p class="ng-subtitle">Advanced AI technology designed for healthcare and wellness teams</p>
+        <div class="ng-feature-grid">
+          <article class="ng-feature-card">
+            <div class="ng-chip ng-orange">RT</div>
+            <h3>Real-time Voice Processing</h3>
+            <p>Fast analysis with machine learning models tuned for voice signals.</p>
+          </article>
+          <article class="ng-feature-card">
+            <div class="ng-chip ng-magenta">SL</div>
+            <h3>Stress Level Detection</h3>
+            <p>Detect stress markers from frequency variation, timing, and instability patterns.</p>
+          </article>
+          <article class="ng-feature-card">
+            <div class="ng-chip ng-blue">RC</div>
+            <h3>Risk Categorization</h3>
+            <p>Classifies outcomes as Low, Medium, or High for fast action and follow-up.</p>
+          </article>
+          <article class="ng-feature-card">
+            <div class="ng-chip ng-green">SP</div>
+            <h3>Secure and Private</h3>
+            <p>Protected medical workflows with authenticated access and controlled records.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="ng-section" id="about">
+      <div class="container ng-about-grid">
+        <div>
+          <div class="ng-badge">About NeuroGard</div>
+          <h2>Revolutionizing Mental Health with AI</h2>
+          <p>
+            NeuroGard combines modern artificial intelligence with practical healthcare workflows to create a reliable voice analysis platform.
+          </p>
+          <p>
+            Our mission is to make emotional and neurological screening more objective, fast, and accessible for patients and providers.
+          </p>
+        </div>
+        <div class="ng-about-cards">
+          <article><h3>AI-Powered</h3><p>Voice pattern models built from large clinical-style datasets.</p></article>
+          <article><h3>Mental Health Focus</h3><p>Designed for stress and emotional marker analysis workflows.</p></article>
+          <article><h3>Privacy First</h3><p>Built with secure authentication and least-access data principles.</p></article>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <div class="auth-container" id="loginSection" style="display: none;" onclick="showLanding()">
+    <div class="auth-card" onclick="event.stopPropagation()">
+      <h1>Welcome Back</h1>
+      <p class="subtitle">Login to NeuroGuard</p>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" required placeholder="your@email.com">
+        </div>
+
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" required placeholder="********">
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block">Login</button>
+      </form>
+
+      <div class="toggle">
+        Don't have account? <a href="#" onclick="showRegisterForm()">Register here</a>
+      </div>
+
+      <button class="btn btn-secondary btn-block" onclick="showLanding()">Back to Home</button>
+    </div>
+  </div>
+
+  <div class="auth-container" id="registerSection" style="display: none;" onclick="showLanding()">
+    <div class="auth-card" onclick="event.stopPropagation()">
+      <h1>Create Account</h1>
+      <p class="subtitle">Join NeuroGuard Today</p>
+
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div id="registerEmailStep">
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="otpEmail" placeholder="your@email.com">
+          </div>
+          <p id="otpModeStatus" class="register-step-note" style="margin-top: -0.5rem; margin-bottom: 0.75rem;"></p>
+          <button type="button" id="sendOtpBtn" class="btn btn-primary btn-block" onclick="requestOtp()">Send Verification Code</button>
+        </div>
+
+        <div id="registerVerifyStep" style="display: none;">
+          <p class="register-step-note">Enter OTP sent to <strong id="otpVerifyEmail"></strong></p>
+          <div class="form-row">
+            <div class="form-group">
+              <label>OTP</label>
+              <input type="text" id="otpCode" maxlength="6" placeholder="6-digit OTP">
+            </div>
+            <div class="form-group" style="align-self: end;">
+              <button type="button" class="btn btn-secondary btn-block" onclick="requestOtp()">Resend OTP</button>
+            </div>
+          </div>
+
+          <button type="button" class="btn btn-primary btn-block" onclick="verifyOtp()">Verify OTP</button>
+          <button type="button" class="btn btn-secondary btn-block" style="margin-top: 0.75rem;" onclick="backToEmailStep()">Change Email</button>
+        </div>
+
+        <div id="registerDetailsStep" style="display: none;">
+          <div class="form-row">
+            <div class="form-group">
+              <label>First Name</label>
+              <input type="text" id="registerName" required placeholder="John">
+            </div>
+            <div class="form-group">
+              <label>Email</label>
+              <input type="email" id="registerEmail" required placeholder="your@email.com" readonly>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Age</label>
+              <input type="number" id="registerAge" required placeholder="25">
+            </div>
+            <div class="form-group">
+              <label>User Type</label>
+              <select id="registerUserType" required>
+                <option value="patient">Patient</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Password</label>
+              <input type="password" id="registerPassword" required placeholder="********" minlength="6">
+            </div>
+            <div class="form-group">
+              <label>Confirm Password</label>
+              <input type="password" id="registerPassword2" required placeholder="********">
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block">Create Account</button>
+        </div>
+      </form>
+
+      <div class="toggle">
+        Already have account? <a href="#" onclick="showLoginForm()">Login here</a>
+      </div>
+
+      <button class="btn btn-secondary btn-block" onclick="showLanding()">Back to Home</button>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-top">
+      <div>
+        <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <p>AI-powered voice analysis for stress detection and health insight support.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#features">Features</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="#">Documentation</a>
+        <a href="#">API</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">HIPAA Compliance</a>
+      </div>
+    </div>
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+
+    let signupVerificationToken = null;
+    let isOtpRequestInFlight = false;
+
+    function showLanding() {
+      document.getElementById('landingSection').style.display = 'block';
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('registerSection').style.display = 'none';
+      document.body.classList.remove('auth-open');
+      const footer = document.querySelector('.ng-footer');
+      if (footer) footer.style.display = '';
+    }
+
+    function showLoginForm() {
+      document.getElementById('loginSection').style.display = 'flex';
+      document.getElementById('registerSection').style.display = 'none';
+      document.getElementById('landingSection').style.display = 'block';
+      document.body.classList.add('auth-open');
+      const footer = document.querySelector('.ng-footer');
+      if (footer) footer.style.display = 'none';
+    }
+
+    function showRegisterForm() {
+      document.getElementById('landingSection').style.display = 'block';
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('registerSection').style.display = 'flex';
+      document.body.classList.add('auth-open');
+      const footer = document.querySelector('.ng-footer');
+      if (footer) footer.style.display = 'none';
+      resetRegisterFlow();
+      loadOtpModeStatus();
+    }
+
+    function resetRegisterFlow() {
+      signupVerificationToken = null;
+      document.getElementById('registerEmailStep').style.display = 'block';
+      document.getElementById('registerVerifyStep').style.display = 'none';
+      document.getElementById('registerDetailsStep').style.display = 'none';
+      document.getElementById('otpCode').value = '';
+      document.getElementById('registerForm').reset();
+    }
+
+    function backToEmailStep() {
+      signupVerificationToken = null;
+      document.getElementById('registerEmailStep').style.display = 'block';
+      document.getElementById('registerVerifyStep').style.display = 'none';
+      document.getElementById('registerDetailsStep').style.display = 'none';
+      document.getElementById('otpCode').value = '';
+      loadOtpModeStatus();
+    }
+
+    async function loadOtpModeStatus() {
+      const statusEl = document.getElementById('otpModeStatus');
+      if (!statusEl) return;
+      statusEl.textContent = 'Checking OTP delivery mode...';
+      statusEl.style.color = '#6b7280';
+
+      const result = await api.getOtpStatus();
+      if (!result.success) {
+        statusEl.textContent = 'OTP mode unavailable right now.';
+        statusEl.style.color = '#b45309';
+        return;
+      }
+
+      const mode = result.data?.delivery_mode;
+      if (mode === 'smtp') {
+        statusEl.textContent = 'Email OTP mode is active.';
+        statusEl.style.color = '#166534';
+      } else if (mode === 'fallback') {
+        statusEl.textContent = 'Demo OTP fallback mode is active (SMTP not configured).';
+        statusEl.style.color = '#92400e';
+      } else {
+        statusEl.textContent = 'OTP service unavailable. Configure SMTP.';
+        statusEl.style.color = '#991b1b';
+      }
+    }
+
+    async function requestOtp() {
+      if (isOtpRequestInFlight) {
+        return;
+      }
+      const email = document.getElementById('otpEmail').value.trim();
+      if (!email) {
+        showAlert('Enter your email first', 'warning');
+        return;
+      }
+
+      isOtpRequestInFlight = true;
+      const sendBtn = document.getElementById('sendOtpBtn');
+      sendBtn.disabled = true;
+      sendBtn.textContent = 'Sending...';
+
+      const loader = showLoading('Sending OTP...');
+      const result = await api.requestSignupOtp(email);
+      hideLoading();
+      isOtpRequestInFlight = false;
+      sendBtn.disabled = false;
+      sendBtn.textContent = 'Send Verification Code';
+
+      if (result.success) {
+        if (result.data && result.data.email_delivery === 'fallback' && result.data.demo_otp) {
+          showAlert(`Demo OTP: ${result.data.demo_otp}`, 'warning');
+        } else {
+          showAlert('OTP sent to your email', 'success');
+        }
+        document.getElementById('otpVerifyEmail').textContent = email;
+        document.getElementById('registerEmailStep').style.display = 'none';
+        document.getElementById('registerVerifyStep').style.display = 'block';
+      } else {
+        showAlert('Failed to send OTP: ' + (result.error || 'Unknown error'), 'danger');
+      }
+    }
+
+    async function verifyOtp() {
+      const email = document.getElementById('otpEmail').value.trim();
+      const otp = document.getElementById('otpCode').value.trim();
+
+      if (!email || !otp) {
+        showAlert('Enter email and OTP', 'warning');
+        return;
+      }
+
+      const loader = showLoading('Verifying OTP...');
+      const result = await api.verifySignupOtp(email, otp);
+      hideLoading();
+
+      if (result.success) {
+        signupVerificationToken = result.data.verification_token;
+        document.getElementById('registerEmail').value = email;
+        document.getElementById('registerVerifyStep').style.display = 'none';
+        document.getElementById('registerDetailsStep').style.display = 'block';
+        showAlert('Email verified. Complete your details.', 'success');
+      } else {
+        showAlert('OTP verification failed: ' + (result.error || 'Unknown error'), 'danger');
+      }
+    }
+
+    async function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const loader = showLoading('Logging in...');
+      const result = await api.login(email, password);
+      hideLoading();
+
+      if (result.success) {
+        showAlert('Login successful!', 'success');
+        setTimeout(() => {
+          document.body.style.animation = 'fadeOut 0.5s ease';
+          setTimeout(() => window.location.href = '/dashboard.html', 500);
+        }, 500);
+      } else {
+        showAlert('Login failed: ' + result.error, 'danger');
+      }
+    }
+
+    async function handleRegister(e) {
+      e.preventDefault();
+      if (!signupVerificationToken) {
+        showAlert('Verify your email with OTP first', 'warning');
+        return;
+      }
+
+      const name = document.getElementById('registerName').value;
+      const email = document.getElementById('registerEmail').value;
+      const age = document.getElementById('registerAge').value;
+      const userType = document.getElementById('registerUserType').value;
+      const password = document.getElementById('registerPassword').value;
+      const password2 = document.getElementById('registerPassword2').value;
+
+      if (password !== password2) {
+        showAlert('Passwords do not match!', 'danger');
+        return;
+      }
+
+      const loader = showLoading('Creating your account...');
+      const result = await api.register(
+        email,
+        password,
+        name,
+        userType,
+        parseInt(age),
+        signupVerificationToken
+      );
+      hideLoading();
+
+      if (result.success) {
+        showAlert('Account created successfully!', 'success');
+        setTimeout(() => {
+          document.body.style.animation = 'fadeOut 0.5s ease';
+          setTimeout(() => window.location.href = '/dashboard.html', 500);
+        }, 500);
+      } else {
+        showAlert('Registration failed: ' + result.error, 'danger');
+      }
+    }
+
+    if (api.isAuthenticated()) {
+      window.location.href = '/dashboard.html';
+    }
+  </script>
+</body>
+</html>
+

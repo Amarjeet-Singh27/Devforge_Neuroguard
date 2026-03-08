@@ -1,0 +1,231 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#667eea">
+  <title>Test Results - NeuroGuard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page app-theme">
+  <nav>
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/voice-test.html">ðŸŽ™ï¸ Voice Test</a>
+        <a href="/medicine-check.html">ðŸ’Š Check Medicine</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+        <a href="#" onclick="api.logout();" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding: 3rem 2rem;">
+    <div class="card">
+      <h1>Test Results</h1>
+      <div id="resultContent">
+        <p class="text-muted">Loading results...</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-top">
+      <div>
+        <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <p>AI-powered voice analysis for stress detection and health insight support.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="/#features">Features</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">HIPAA Compliance</a>
+      </div>
+    </div>
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+
+    // Get test ID from URL
+    const params = new URLSearchParams(window.location.search);
+    const testId = params.get('id');
+
+    if (testId) {
+      loadTestResult(testId);
+    } else {
+      document.getElementById('resultContent').innerHTML = '<p>No test ID provided.</p>';
+    }
+
+    async function downloadPdfReport(testIdValue) {
+      const result = await api.downloadVoiceReport(testIdValue);
+      if (!result.success) {
+        showAlert('PDF download failed: ' + (result.error || 'Unknown error'), 'danger');
+      }
+    }
+
+    async function loadTestResult(id) {
+      const result = await api.getVoiceTest(id);
+      if (result.success) {
+        const test = result.data;
+        const stressLevel = test.stress_level || test.risk_level || 'Unknown';
+        const stressScore = Number(test.stress_score ?? test.risk_score ?? 0) || 0;
+        const riskClass = `risk-${stressLevel.toLowerCase()}`;
+        const report = test.detailed_report || {};
+        const concerns = Array.isArray(report.primary_concerns) ? report.primary_concerns : [];
+        const actions = Array.isArray(report.recommended_actions) ? report.recommended_actions : [];
+        const metrics = Array.isArray(report.metric_breakdown) ? report.metric_breakdown : [];
+
+        const escapeHtml = (value) => String(value ?? '')
+          .replaceAll('&', '&amp;')
+          .replaceAll('<', '&lt;')
+          .replaceAll('>', '&gt;')
+          .replaceAll('"', '&quot;')
+          .replaceAll("'", '&#39;');
+
+        const metricsHtml = metrics.length
+          ? metrics.map((item) => `
+              <tr>
+                <td>${escapeHtml(item.metric)}</td>
+                <td><strong>${Number(item.score || 0).toFixed(1)}%</strong></td>
+                <td>${escapeHtml(item.band || 'N/A')}</td>
+                <td>${escapeHtml(item.interpretation || '')}</td>
+              </tr>
+            `).join('')
+          : '';
+
+        const concernsHtml = concerns.length
+          ? concerns.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+          : '<li>No major concerns identified in this sample.</li>';
+
+        const actionsHtml = actions.length
+          ? actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+          : '<li>Repeat this test later for trend tracking.</li>';
+
+        const html = `
+          <div class="flex flex-between" style="margin-bottom: 1.5rem;">
+            <div>
+              <h2>${stressLevel} Stress Level</h2>
+              <p class="text-muted">Test Date: ${formatDate(test.test_date)}</p>
+            </div>
+            <span class="risk-badge ${riskClass}" style="font-size: 1.5rem; padding: 1rem 1.5rem;">
+              ${stressScore.toFixed(1)}%
+            </span>
+          </div>
+
+          <div class="progress-bar" style="margin-bottom: 2rem;">
+            <div class="progress-fill" style="width: ${stressScore}%">${stressScore.toFixed(1)}%</div>
+          </div>
+
+          <div class="grid grid-3" style="margin-bottom: 2rem;">
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Slurring Score</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${Number(test.slurring_score || 0).toFixed(1)}%</strong>
+            </div>
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Speech Delay</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${Number(test.speech_delay_score || 0).toFixed(1)}%</strong>
+            </div>
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Frequency Variation</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${Number(test.frequency_variation_score || 0).toFixed(1)}%</strong>
+            </div>
+          </div>
+
+          <div style="background: #fef3c7; padding: 1.5rem; border-radius: 10px; border-left: 4px solid #f59e0b;">
+            <strong style="color: #92400e;">Recommendation:</strong>
+            <p style="margin: 0.5rem 0 0 0; color: #92400e;">${escapeHtml(test.recommendations || '')}</p>
+          </div>
+
+          <div class="detailed-report-surface" style="margin-top: 1.25rem; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.25rem;">
+            <h3 style="margin-top: 0;">Detailed Report</h3>
+            <p style="margin: 0.5rem 0 1rem 0; color: #374151;"><strong>${escapeHtml(report.headline || 'Voice stress screening summary')}</strong></p>
+            <p style="margin: 0 0 1rem 0; color: #4b5563;">${escapeHtml(report.summary || test.recommendations || '')}</p>
+
+            <div style="overflow-x: auto; margin-bottom: 1rem;">
+              <table class="detailed-report-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                  <tr>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Metric</th>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Score</th>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Band</th>
+                    <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Interpretation</th>
+                  </tr>
+                </thead>
+                <tbody>${metricsHtml}</tbody>
+              </table>
+            </div>
+
+            <div class="grid grid-2" style="gap: 1rem;">
+              <div class="detailed-report-subcard" style="background: #f9fafb; border-radius: 8px; padding: 0.9rem;">
+                <strong>Primary Concerns</strong>
+                <ul style="margin: 0.5rem 0 0 1.1rem;">${concernsHtml}</ul>
+              </div>
+              <div class="detailed-report-subcard" style="background: #f9fafb; border-radius: 8px; padding: 0.9rem;">
+                <strong>Action Plan</strong>
+                <ul style="margin: 0.5rem 0 0 1.1rem;">${actionsHtml}</ul>
+              </div>
+            </div>
+
+            <p style="margin: 1rem 0 0.25rem 0; color: #4b5563;"><strong>Follow-up window:</strong> ${escapeHtml(report.follow_up_window || 'Not specified')}</p>
+            <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">${escapeHtml(report.disclaimer || '')}</p>
+          </div>
+
+          <div style="margin-top: 2rem;">
+            <a href="/dashboard.html" class="btn btn-primary">Back to Dashboard</a>
+            <a href="/voice-test.html" class="btn btn-secondary" style="margin-left: 0.5rem;">Take Another Test</a>
+            <button class="btn btn-secondary" style="margin-left: 0.5rem;" onclick="downloadPdfReport('${test.id}')">Download PDF Report</button>
+          </div>
+        `;
+
+        document.getElementById('resultContent').innerHTML = html;
+      } else {
+        document.getElementById('resultContent').innerHTML = '<p>Failed to load test results.</p>';
+      }
+    }
+  </script>
+</body>
+</html>
+

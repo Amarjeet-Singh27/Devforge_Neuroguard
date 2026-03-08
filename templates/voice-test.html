@@ -1,0 +1,587 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#667eea">
+  <title>Voice Test - NeuroGuard</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="landing-page app-theme">
+  <nav>
+    <div class="container">
+      <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+      <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a href="/dashboard.html">Dashboard</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Check Medicine</a>
+        <a href="/contact.html">Contact</a>
+        <a href="/admin-messages.html" class="admin-only">Admin Messages</a>
+        <a href="#" onclick="api.logout();" class="logout-btn">Logout</a>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container" style="padding: 3rem 2rem;">
+    <div class="dashboard-header">
+      <h1>Voice Stress Screening</h1>
+      <p>Read the sentence below and record your voice for analysis</p>
+    </div>
+
+    <div class="grid grid-2">
+      <!-- Recording Section -->
+      <div class="card">
+        <h2>Record Your Voice</h2>
+
+        <!-- Test Sentence -->
+        <div style="background: #f0f4ff; padding: 1.5rem; border-radius: 10px; margin-bottom: 1.5rem; border-left: 4px solid #667eea;">
+          <p style="margin: 0; font-size: 1.1rem; color: #1f2937; line-height: 1.8;">
+            <strong id="readingPrompt"></strong>
+          </p>
+          <small style="color: #6b7280; margin-top: 1rem; display: block;">Read this sentence clearly and naturally, then submit your audio.</small>
+          <button id="newPromptBtn" class="btn btn-secondary" type="button" style="margin-top: 0.8rem;" onclick="pickNewPrompt()">
+            Try Another Sentence
+          </button>
+        </div>
+
+        <!-- Audio Recorder -->
+        <div class="audio-recorder">
+          <div class="icon">Mic</div>
+          <p style="margin-bottom: 1rem;">Click the button below to start recording</p>
+          
+          <div class="audio-controls">
+            <button id="recordBtn" class="btn btn-success" onclick="startRecording()">Start Recording</button>
+            <button id="stopBtn" class="btn btn-danger" onclick="stopRecording()" style="display: none;">Stop Recording</button>
+          </div>
+          <p id="micHint" style="margin-top: 0.8rem; color: #6b7280; font-size: 0.92rem;"></p>
+
+          <div id="recordingIndicator" style="display: none;" class="recording-indicator">
+            <div class="pulse"></div>
+            Recording...
+          </div>
+
+          <div id="audioPreview" style="margin-top: 1rem; display: none;">
+            <audio id="audioPlayback" style="width: 100%; margin-bottom: 1rem;"></audio>
+            <div style="display: flex; gap: 1rem;">
+              <button class="btn btn-secondary" onclick="retakeRecording()">Retake</button>
+              <button class="btn btn-primary" style="flex: 1;" onclick="submitRecording()">Use This Recording</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload Alternative -->
+        <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+          <p style="margin-bottom: 1rem; color: #6b7280;"><strong>OR upload an audio file:</strong></p>
+          <input type="file" id="audioFile" accept="audio/*" onchange="handleFileSelect(event)">
+          <button class="btn btn-primary btn-block" style="margin-top: 1rem;" onclick="uploadFile()">Upload & Analyze</button>
+        </div>
+      </div>
+
+      <!-- Results Section -->
+      <div class="card" id="resultsSection" style="display: none;">
+        <h2>Analysis Results</h2>
+        
+        <div id="loadingSpinner" class="spinner" style="display: none;"></div>
+
+        <div id="resultsContent">
+          <!-- Results will be inserted here -->
+        </div>
+      </div>
+
+      <!-- Information Section (if no results) -->
+      <div class="card" id="infoSection">
+        <h2>How It Works</h2>
+        <p><strong>Step 1:</strong> Read the provided sentence naturally</p>
+        <p><strong>Step 2:</strong> Record your voice or upload an audio file</p>
+        <p><strong>Step 3:</strong> Our AI analyzes your voice for neurological indicators</p>
+        
+        <div style="background: #fef3c7; padding: 1rem; margin-top: 1rem; border-radius: 5px; border-left: 4px solid #f59e0b;">
+          <strong style="color: #92400e;">What we analyze:</strong>
+          <ul style="margin: 0.5rem 0 0 1.5rem; color: #92400e;">
+            <li>Slurring patterns</li>
+            <li>Speech delays</li>
+            <li>Frequency variations</li>
+            <li>Tremor patterns</li>
+          </ul>
+        </div>
+
+        <div style="background: #dcfce7; padding: 1rem; margin-top: 1rem; border-radius: 5px; border-left: 4px solid #10b981;">
+          <strong style="color: #166534;">Stress Levels:</strong>
+          <ul style="margin: 0.5rem 0 0 1.5rem; color: #166534;">
+            <li><strong>Low (0-33%):</strong> Normal voice assessment</li>
+            <li><strong>Medium (33-66%):</strong> Consult doctor within 1-2 weeks</li>
+            <li><strong>High (66-100%):</strong> Urgent consultation recommended</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Past Tests -->
+    <div class="card" style="margin-top: 2rem;">
+      <h2>Your Test History</h2>
+      <div id="testHistory">
+        <p class="text-muted">Loading tests...</p>
+      </div>
+    </div>
+  </div>
+
+  <footer class="ng-footer">
+    <div class="container ng-footer-top">
+      <div>
+        <div class="brand"><span class="site-logo" aria-hidden="true"></span><span>NeuroGuard</span></div>
+        <p>AI-powered voice analysis for stress detection and health insight support.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="/#features">Features</a>
+        <a href="/voice-test.html">Voice Test</a>
+        <a href="/medicine-check.html">Medicine Check</a>
+        <a href="/dashboard.html">Dashboard</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="/#about">About Us</a>
+        <a href="#">Careers</a>
+        <a href="#">Blog</a>
+        <a href="/contact.html">Contact Us</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Policy</a>
+        <a href="#">HIPAA Compliance</a>
+      </div>
+    </div>
+    <div class="container ng-footer-bottom">
+      <p>&copy; 2026 NeuroGard. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="/static/js/api.js"></script>
+  <script src="/static/js/dynamic.js"></script>
+  <script>
+    function toggleMenu() {
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    }
+
+    // Close menu when a link is clicked
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        document.getElementById('hamburger').classList.remove('active');
+        document.getElementById('navLinks').classList.remove('active');
+      });
+    });
+
+    // Check authentication
+    if (!api.isAuthenticated()) {
+      window.location.href = '/';
+    }
+
+    let mediaRecorder;
+    let recordingMimeType = 'audio/webm';
+    let recordedChunks = [];
+    let recordedBlob = null;
+    let currentPrompt = '';
+    const readingPrompts = [
+      'The weather is calm today, and I feel relaxed while speaking clearly.',
+      'I am reading this sentence in a steady voice with natural pauses.',
+      'Please listen carefully as I speak each word clearly and at a normal pace.',
+      'Every morning I drink water, stretch for ten minutes, and start my day calmly.',
+      'This short recording helps check speech rhythm, clarity, and voice stability.'
+    ];
+
+    function isLocalhostHost(hostname) {
+      return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '::1';
+    }
+
+    function getMicBlockReason() {
+      const secureOrLocal = window.isSecureContext || isLocalhostHost(window.location.hostname);
+      if (!secureOrLocal) {
+        const secureUrl = `https://${window.location.host}${window.location.pathname}`;
+        return `Microphone needs HTTPS (or localhost). Open: ${secureUrl}`;
+      }
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        return 'This browser does not support microphone recording. Please upload audio instead.';
+      }
+      return '';
+    }
+
+    function updateMicAvailabilityHint() {
+      const micHint = document.getElementById('micHint');
+      const recordBtn = document.getElementById('recordBtn');
+      const reason = getMicBlockReason();
+      if (reason) {
+        micHint.textContent = reason;
+        micHint.style.color = '#b45309';
+        recordBtn.title = reason;
+        return false;
+      }
+      micHint.textContent = 'Microphone ready. Click Start Recording and read the sentence naturally.';
+      micHint.style.color = '#166534';
+      recordBtn.title = '';
+      return true;
+    }
+
+    function pickNewPrompt() {
+      if (!readingPrompts.length) {
+        currentPrompt = '';
+        document.getElementById('readingPrompt').textContent = '';
+        return;
+      }
+      const nextPrompt = readingPrompts[Math.floor(Math.random() * readingPrompts.length)];
+      currentPrompt = nextPrompt;
+      document.getElementById('readingPrompt').textContent = `"${nextPrompt}"`;
+    }
+
+    // Start recording
+    async function startRecording() {
+      const reason = getMicBlockReason();
+      if (reason) {
+        showAlert(reason, 'warning');
+        updateMicAvailabilityHint();
+        return;
+      }
+
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const preferredTypes = [
+          'audio/webm;codecs=opus',
+          'audio/webm',
+          'audio/mp4',
+          'audio/ogg;codecs=opus'
+        ];
+        const selectedType = preferredTypes.find((type) => MediaRecorder.isTypeSupported(type));
+        mediaRecorder = selectedType ? new MediaRecorder(stream, { mimeType: selectedType }) : new MediaRecorder(stream);
+        recordingMimeType = mediaRecorder.mimeType || selectedType || 'audio/webm';
+        recordedChunks = [];
+
+        mediaRecorder.ondataavailable = (e) => recordedChunks.push(e.data);
+        mediaRecorder.onstop = () => {
+          recordedBlob = new Blob(recordedChunks, { type: recordingMimeType });
+          showAudioPreview();
+        };
+
+        mediaRecorder.start();
+        document.getElementById('recordBtn').style.display = 'none';
+        document.getElementById('stopBtn').style.display = 'inline-block';
+        document.getElementById('recordingIndicator').style.display = 'flex';
+      } catch (error) {
+        if (error && (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError')) {
+          showAlert('Microphone permission was denied. Allow microphone access in browser site settings and try again.', 'danger');
+        } else {
+          showAlert('Unable to start recording: ' + (error?.message || 'unknown microphone error'), 'danger');
+        }
+      }
+    }
+
+    // Stop recording
+    function stopRecording() {
+      if (!mediaRecorder || mediaRecorder.state === 'inactive') {
+        showAlert('Recording is not active.', 'warning');
+        return;
+      }
+      mediaRecorder.stop();
+      mediaRecorder.stream.getTracks().forEach(track => track.stop());
+      document.getElementById('recordBtn').style.display = 'inline-block';
+      document.getElementById('stopBtn').style.display = 'none';
+      document.getElementById('recordingIndicator').style.display = 'none';
+    }
+
+    // Show audio preview
+    function showAudioPreview() {
+      const url = URL.createObjectURL(recordedBlob);
+      document.getElementById('audioPlayback').src = url;
+      document.getElementById('audioPreview').style.display = 'block';
+    }
+
+    // Retake recording
+    function retakeRecording() {
+      document.getElementById('audioPreview').style.display = 'none';
+      recordedBlob = null;
+      recordedChunks = [];
+      document.getElementById('recordBtn').style.display = 'inline-block';
+    }
+
+    // Handle file selection
+    function handleFileSelect(event) {
+      recordedBlob = event.target.files[0];
+      if (recordedBlob) {
+        const url = URL.createObjectURL(recordedBlob);
+        document.getElementById('audioPlayback').src = url;
+        document.getElementById('audioPreview').style.display = 'block';
+      }
+    }
+
+    // Submit recording/file
+    async function submitRecording() {
+      if (!recordedBlob) {
+        showAlert('No audio to submit', 'danger');
+        return;
+      }
+
+      document.getElementById('resultsSection').style.display = 'block';
+      document.getElementById('infoSection').style.display = 'none';
+      document.getElementById('loadingSpinner').style.display = 'block';
+
+      try {
+        const result = await api.uploadVoiceTest(recordedBlob, {
+          reference_sentence: currentPrompt,
+          source: document.getElementById('audioFile').files[0] ? 'upload' : 'recording'
+        });
+        document.getElementById('loadingSpinner').style.display = 'none';
+
+        if (result.success) {
+          showAlert('Voice test completed.', 'success');
+          displayResults(result.data.test_result);
+          loadTestHistory();
+          recordedBlob = null;
+          document.getElementById('audioFile').value = '';
+          document.getElementById('audioPreview').style.display = 'none';
+        } else {
+          document.getElementById('resultsSection').style.display = 'none';
+          document.getElementById('infoSection').style.display = 'block';
+          const errorMsg = result.error || 'Unknown error occurred';
+          showAlert('Analysis failed: ' + errorMsg, 'danger');
+        }
+      } catch (error) {
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('resultsSection').style.display = 'none';
+        document.getElementById('infoSection').style.display = 'block';
+        showAlert('Error: ' + (error.message || 'Voice analysis failed'), 'danger');
+      }
+    }
+
+    // Upload file
+    async function uploadFile() {
+      if (!document.getElementById('audioFile').files[0]) {
+        showAlert('Please select a file', 'danger');
+        return;
+      }
+
+      recordedBlob = document.getElementById('audioFile').files[0];
+      submitRecording();
+    }
+
+    async function downloadPdfReport(testId) {
+      if (!testId) {
+        showAlert('Report ID is missing', 'warning');
+        return;
+      }
+      const result = await api.downloadVoiceReport(testId);
+      if (!result.success) {
+        showAlert('PDF download failed: ' + (result.error || 'Unknown error'), 'danger');
+      }
+    }
+
+    function getStressLevel(test) {
+      return test.stress_level || test.risk_level || 'Unknown';
+    }
+
+    function getStressScore(test) {
+      const score = test.stress_score ?? test.risk_score ?? 0;
+      return Number(score) || 0;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+    }
+
+    function buildDetailedReportHtml(test) {
+      const report = test.detailed_report || {};
+      const concerns = Array.isArray(report.primary_concerns) ? report.primary_concerns : [];
+      const actions = Array.isArray(report.recommended_actions) ? report.recommended_actions : [];
+      const metrics = Array.isArray(report.metric_breakdown) ? report.metric_breakdown : [];
+
+      const concernsHtml = concerns.length
+        ? concerns.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+        : '<li>No major concerns identified in this sample.</li>';
+
+      const actionsHtml = actions.length
+        ? actions.map((item) => `<li>${escapeHtml(item)}</li>`).join('')
+        : '<li>Repeat this test later for trend tracking.</li>';
+
+      const metricsHtml = metrics.length
+        ? metrics.map((item) => `
+            <tr>
+              <td>${escapeHtml(item.metric)}</td>
+              <td><strong>${Number(item.score || 0).toFixed(1)}%</strong></td>
+              <td>${escapeHtml(item.band || 'N/A')}</td>
+              <td>${escapeHtml(item.interpretation || '')}</td>
+            </tr>
+          `).join('')
+        : `
+          <tr>
+            <td>Slurring</td>
+            <td><strong>${(test.slurring_score || 0).toFixed(1)}%</strong></td>
+            <td>-</td>
+            <td>Baseline metric.</td>
+          </tr>
+          <tr>
+            <td>Speech Delay</td>
+            <td><strong>${(test.speech_delay_score || 0).toFixed(1)}%</strong></td>
+            <td>-</td>
+            <td>Baseline metric.</td>
+          </tr>
+          <tr>
+            <td>Frequency Variation</td>
+            <td><strong>${(test.frequency_variation_score || 0).toFixed(1)}%</strong></td>
+            <td>-</td>
+            <td>Baseline metric.</td>
+          </tr>
+          <tr>
+            <td>Tremor Pattern</td>
+            <td><strong>${(test.tremor_score || 0).toFixed(1)}%</strong></td>
+            <td>-</td>
+            <td>Baseline metric.</td>
+          </tr>
+        `;
+
+      return `
+        <div class="detailed-report-surface" style="margin-top: 1.25rem; background: #ffffff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 1.25rem;">
+          <h4 style="margin-top: 0;">Detailed Report</h4>
+          <p style="margin: 0.5rem 0 1rem 0; color: #374151;"><strong>${escapeHtml(report.headline || 'Voice stress screening summary')}</strong></p>
+          <p style="margin: 0 0 1rem 0; color: #4b5563;">${escapeHtml(report.summary || test.recommendations || '')}</p>
+
+          <div style="overflow-x: auto; margin-bottom: 1rem;">
+            <table class="detailed-report-table" style="width: 100%; border-collapse: collapse;">
+              <thead>
+                <tr>
+                  <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Metric</th>
+                  <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Score</th>
+                  <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Band</th>
+                  <th style="text-align: left; padding: 0.5rem; border-bottom: 1px solid #e5e7eb;">Interpretation</th>
+                </tr>
+              </thead>
+              <tbody>${metricsHtml}</tbody>
+            </table>
+          </div>
+
+          <div class="grid grid-2" style="gap: 1rem;">
+            <div class="detailed-report-subcard" style="background: #f9fafb; border-radius: 8px; padding: 0.9rem;">
+              <strong>Primary Concerns</strong>
+              <ul style="margin: 0.5rem 0 0 1.1rem;">${concernsHtml}</ul>
+            </div>
+            <div class="detailed-report-subcard" style="background: #f9fafb; border-radius: 8px; padding: 0.9rem;">
+              <strong>Action Plan</strong>
+              <ul style="margin: 0.5rem 0 0 1.1rem;">${actionsHtml}</ul>
+            </div>
+          </div>
+
+          <p style="margin: 1rem 0 0.25rem 0; color: #4b5563;"><strong>Follow-up window:</strong> ${escapeHtml(report.follow_up_window || 'Not specified')}</p>
+          <p style="margin: 0; font-size: 0.9rem; color: #6b7280;">${escapeHtml(report.disclaimer || '')}</p>
+        </div>
+      `;
+    }
+
+    // Display results
+    function displayResults(test) {
+      const stressLevel = getStressLevel(test);
+      const stressScore = getStressScore(test);
+      const riskClass = `risk-${stressLevel.toLowerCase()}`;
+      const referenceSentence = (test.reference_sentence || '').trim();
+      const resultsHtml = `
+        <div style="margin-bottom: 2rem;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+            <h3>Stress Assessment</h3>
+            <span class="risk-badge ${riskClass}">${stressLevel} - ${stressScore}%</span>
+          </div>
+
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${stressScore}%">${Math.round(stressScore)}%</div>
+          </div>
+
+          <div class="grid grid-3" style="margin-top: 1.5rem; gap: 1rem;">
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Slurring</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${test.slurring_score.toFixed(1)}%</strong>
+            </div>
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Speech Delay</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${test.speech_delay_score.toFixed(1)}%</strong>
+            </div>
+            <div style="background: #f0f4ff; padding: 1rem; border-radius: 5px;">
+              <small class="text-muted">Frequency Var.</small><br>
+              <strong style="color: #667eea; font-size: 1.5rem;">${test.frequency_variation_score.toFixed(1)}%</strong>
+            </div>
+          </div>
+        </div>
+
+        <div style="background: ${stressLevel === 'High' ? '#fee2e2' : stressLevel === 'Medium' ? '#fef3c7' : '#dcfce7'}; 
+                    padding: 1.5rem; border-radius: 10px; border-left: 4px solid ${stressLevel === 'High' ? '#ef4444' : stressLevel === 'Medium' ? '#f59e0b' : '#10b981'};">
+          <strong>Recommendation:</strong>
+          <p style="margin-top: 0.5rem;">${test.recommendations}</p>
+        </div>
+
+        <div style="margin-top: 1.5rem; text-align: center; color: #6b7280;">
+          <small>Test performed: ${formatDate(test.test_date)}</small>
+        </div>
+        ${referenceSentence ? `
+        <div style="margin-top: 1rem; background: #f0f4ff; border-radius: 8px; padding: 0.9rem;">
+          <small class="text-muted">Reference sentence used:</small>
+          <p style="margin: 0.4rem 0 0 0; color: #1f2937;"><strong>"${escapeHtml(referenceSentence)}"</strong></p>
+        </div>` : ''}
+
+        ${buildDetailedReportHtml(test)}
+
+        <div style="margin-top: 1rem; text-align: right;">
+          <button class="btn btn-secondary" onclick="downloadPdfReport('${test.id}')">Download PDF Report</button>
+        </div>
+      `;
+      document.getElementById('resultsContent').innerHTML = resultsHtml;
+    }
+
+    // Load test history
+    async function loadTestHistory() {
+      const result = await api.getVoiceHistory();
+      if (result.success && result.data.tests.length > 0) {
+        const tests = result.data.tests;
+        let html = '<div class="history-table-wrapper"><table class="history-table"><thead><tr><th>Date</th><th>Stress</th><th>Score</th><th>Details</th></tr></thead><tbody>';
+        
+        tests.forEach(test => {
+          const stressLevel = getStressLevel(test);
+          const stressScore = getStressScore(test);
+          const riskClass = `risk-${stressLevel.toLowerCase()}`;
+          html += `
+            <tr>
+              <td>${formatDate(test.test_date)}</td>
+              <td><span class="risk-badge ${riskClass}">${stressLevel}</span></td>
+              <td><strong>${stressScore.toFixed(1)}%</strong></td>
+              <td>
+                Slurring: ${test.slurring_score.toFixed(1)}% | 
+                Delay: ${test.speech_delay_score.toFixed(1)}% | 
+                Tremor: ${test.tremor_score.toFixed(1)}%
+              </td>
+            </tr>
+          `;
+        });
+        
+        html += '</tbody></table></div>';
+        document.getElementById('testHistory').innerHTML = html;
+      }
+    }
+
+    // Load test history on page load
+    pickNewPrompt();
+    loadTestHistory();
+    updateMicAvailabilityHint();
+  </script>
+</body>
+</html>
+
+
