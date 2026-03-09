@@ -193,9 +193,7 @@ This writes `model_metrics.json`.
 - `GET /api/medicine/list-batches` (JWT)
 - `GET /api/medicine/qr-generate/<batch_id>`
 
-### Contact
-- `POST /api/contact`
-- `GET /api/contact/list` (JWT)
+
 
 ## Testing
 Run tests:
